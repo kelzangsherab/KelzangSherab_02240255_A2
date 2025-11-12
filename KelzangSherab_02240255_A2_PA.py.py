@@ -1,136 +1,65 @@
-import random
+def linear_search(student_ids, target_id):
+    comparisons = 0
+    for index, student_id in enumerate(student_ids):
+        comparisons += 1
+        if student_id == target_id:
+            return index + 1, comparisons  
+    return -1, comparisons 
 
-class GuessNumberGame:
-    def __init__(self):
-        self.number_to_guess = random.randint(1, 10) 
-        self.attempts = 0
-
-    def play(self):
-        print("Welcome to the Guessing Game! Guess any numbers (1-10).")
-        while True:
-            try:
-                guess = int(input("Enter any number: "))
-                self.attempts += 1
-                if guess < self.number_to_guess:
-                    print("Bit low")
-                elif guess > self.number_to_guess:
-                    print("Bit high")
-                else:
-                    print(f"Congrats! You have guess number  {self.number_to_guess} in {self.attempts} tries.")
-                    return max(0, 10 - self.attempts)
-            except ValueError:
-                print("Please enter a number in given range.")
-
-class RockPaperScissors:
-    def play(self):
-        choices = ["rock", "paper", "scissors"]
-        user_choice = input("Choose rock, paper, or scissors: ").lower()
-        if user_choice not in choices:
-            print("Invalid choice. Have another go.")
-            return
-        bot_choice = random.choice(choices)
-        print(f"Bot: {bot_choice}")
-        if user_choice == bot_choice:
-            print("Draw")
-        elif (user_choice == 'rock' and bot_choice == 'scissors') or \
-             (user_choice == 'paper' and bot_choice == 'rock') or \
-             (user_choice == 'scissors' and bot_choice == 'paper'):
-            print("You won!")
+def binary_search(scores, target_score):
+    left, right = 0, len(scores) - 1
+    comparisons = 0
+    while left <= right:
+        comparisons += 1
+        mid = (left + right) // 2
+        if scores[mid] == target_score:
+            return mid + 1, comparisons  
+        elif scores[mid] < target_score:
+            left = mid + 1
         else:
-            print("You lose!")
+            right = mid - 1
+    return -1, comparisons  # Not found
 
-class TriviaQuiz:
-    def __init__(self):
-        self.question = {
-            "What is the capital city of Bhutan?": ["a) Trongsa", "b) Punakha", "c) Thimphu", "d) Gelephu", 'c'],
-            "What is 9 + 18?": ["a) 30", "b) 41", "c) 29", "d) 27", 'd'],
-            "How many days are there in a year?": ["a) 366", "b) 365", "c) 367", "d) 368", 'b']
-        }
+def main():
+    student_ids = [2240240, 2240241, 2240242, 2240243, 2240244, 2240245, 2240246, 2240247, 2240248, 2240249, 2240250, 
+                   2240251, 2240252, 2240253, 2240254, 2240255, 2240256, 2240257,]
+    
+    sorted_scores = [35, 40, 48, 53, 57, 62, 65, 70, 82, 87,
+                     88, 90, 94]
 
-    def play(self):
-        score = 0
-        for question, options in self.question.items():
-            print(question)
-            for option in options[:-1]:
-                print(option)
-            answer = input('Your answer (a/b/c/d): ').lower()
-            if answer == options[-1]:
-                print("Well Done!")
-                score += 1
+    while True:
+        print("\n=== Searching Algorithms Menu ===")
+        print("Select a search operation (1-3):")
+        print("1. Linear Search - Find Student ID")
+        print("2. Binary Search - Find Score")
+        print("3. Exit program")
+
+        choice = input("Enter your choice: ")
+
+        if choice == '1':
+            print(f"Searching in the list: {student_ids}")
+            target_id = int(input("Enter Student ID to search: "))
+            result, comparisons = linear_search(student_ids, target_id)
+            if result != -1:
+                print(f"Result: Student ID {target_id} found at position {result} | Comparisons made: {comparisons}")
             else:
-                print("Sorry.")
-        print(f"Your score: {score}/{len(self.questions)}")
-
-class PokemonCardManager:
-    def __init__(self):
-        self.cards = []
-
-    def manage(self):
-        while True:
-            action = input("Would you like to add a card (s), view all cards (c), or exit (o)? ").lower()
-            if action == 's':
-                name = input("Enter the Pokemon names: ")
-                type_ = input("Enter the Pokemon types: ")
-                self.cards.append({'name': name, 'type': type_})
-                print(f"Card for {name} added.")
-            elif action == 'c':
-                if self.cards:
-                    print("Your Pokémon Cards:")
-                    for card in self.cards:
-                        print(f"{card['name']} - Type: {card['type']}")
-                else:
-                    print("There's no cards in your binder.")
-            elif action == 'o':
-                break
+                print("Result: Student ID not found.")
+        
+        elif choice == '2':
+            print(f"Sorted scores: {sorted_scores}")
+            target_score = int(input("Enter Score to search: "))
+            result, comparisons = binary_search(sorted_scores, target_score)
+            if result != -1:
+                print(f"Result: Score {target_score} found at position {result} | Comparisons made: {comparisons}")
             else:
-                print("Invalid option.")
-
-class OverallScoringSystem:
-    def __init__(self):
-        self.total_score = 0
-
-    def manage(self):
-        while True:
-            score = input("Enter the score for this round (or type 'exit' to finish): ")
-            if score.lower() == 'exit':
-                break
-            try:
-                self.total_score += int(score)
-            except ValueError:
-                print("Please enter a valid number.")
-        print(f"Your total score is: {self.total_score}")
-
-class MainMenu:
-    def __init__(self):
-        self.games = {
-            '1': GuessNumberGame(),
-            '2': RockPaperScissors(),
-            '3': TriviaQuiz(),
-            '4': PokemonCardManager(),
-            '5': OverallScoringSystem()
-        }
-
-    def display_menu(self):
-        while True:
-            print('\nMenu:')
-            print('1/ Guess Number Game')
-            print('2/ Rock Paper Scissors')
-            print('3/ Trivia Quiz')
-            print('4/ Pokémon Card Binder Manager')
-            print('5/ Overall Scoring System')
-            print('6/ Exit')
-            
-            choice = input("choose a Game (1-6): ")
-            if choice == '1':
-                score = self.games[choice].play()
-                print(f"Your score for Guessing Game: {score}")
-            elif choice in self.games:
-                self.games[choice].play() if choice != '4' else self.games[choice].manage()
-            elif choice == '6':
-                print("Exiting the program. Come Back Stronger!")
-                break
-            else:
-                print("Invalid choice. Please select a number (1-6).")
+                print("Result: Score not found.")
+        
+        elif choice == '3':
+            print("Thank you for using the search program!")
+            break
+        
+        else:
+            print("Invalid choice. Please select a valid operation.")
 
 if __name__ == "__main__":
-    MainMenu().display_menu()
+    main()
