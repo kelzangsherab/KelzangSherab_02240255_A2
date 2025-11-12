@@ -1,99 +1,84 @@
-class PokemonCardBinder:
+def bubble_sort(names):
+    n = len(names)
+    for i in range(n):
+        for j in range(0, n-i-1):
+            if names[j] > names[j+1]:
+                names[j], names[j+1] = names[j+1], names[j]
+    return names
+
+def insertion_sort(scores):
+    for i in range(1, len(scores)):
+        key = scores[i]
+        j = i - 1
+        while j >= 0 and key < scores[j]:
+            scores[j + 1] = scores[j]
+            j -= 1
+        scores[j + 1] = key
+    return scores
+
+def quick_sort(prices, low, high, recursive_calls):
+    if low < high:
+        pi, recursive_calls = partition(prices, low, high, recursive_calls)
+        recursive_calls = quick_sort(prices, low, pi-1, recursive_calls)
+        recursive_calls = quick_sort(prices, pi+1, high, recursive_calls)
+    return recursive_calls
+
+def partition(prices, low, high, recursive_calls):
+    pivot = prices[high]
+    i = low - 1
+    for j in range(low, high):
+        if prices[j] <= pivot:
+            i += 1
+            prices[i], prices[j] = prices[j], prices[i]
+    prices[i + 1], prices[high] = prices[high], prices[i + 1]
+    return i + 1, recursive_calls + 1
+
+def main():
+    student_names = ["Dechen", "Dorji", "Kinga", "Kinley", "Lhamo", 
+                     "Ugyen", "Dhendup", "Wangchu", "Rinchn", "Kezang", 
+                     "Pema", "Samten", "Gyelpo", "Nidup", "Choki", "Phuntsho"]
     
-    MAX_POKEDEX_NUMBER = 1025
-    CARDS_PER_PAGE = 64
-    CARDS_PER_ROW = 9
-    CARDS_PER_COLUMN = 9
+    test_scores = [ 0, 1, 1.5, 2, 3, 3, 3.5, 4, 5.5, 6, 7, 8, 9,]
+    
+    book_prices = [20, 40, 65, 80, 85, 120, 130,175, 200, 210, 220, 240,275, 300, 450, 500]
 
-    def __init__(self):
-        self.binder = {}
-        self.total_cards = 0
+    while True:
+        print("\n=== Sorting Algorithms Menu ===")
+        print("Select a sorting operation (1-4):")
+        print("1. Bubble Sort - Sort Student Names")
+        print("2. Insertion Sort - Sort Test Scores")
+        print("3. Quick Sort - Sort Book Prices")
+        print("4. Exit program")
 
-    def add_card(self, pokedex_number):
-        if not self.is_valid_pokedex_number(pokedex_number):
-            print("Invalid Pokedex number. Please enter a number (1-1025).")
-            return
-        
-        if pokedex_number in self.binder:
-            print(f"Pokedex {pokedex_number} already exists .")
-            return
-        
-        page_number = self.calculate_page_number()
-        position = self.calculate_position()
+        choice = input("Enter your choice: ")
 
-        self.binder[pokedex_number] = (page_number, position)
-        self.total_cards += 1
-        print(f"Page: {page_number} - Position: Row {position[0]}, Column {position[1]} Status: Added Pokedex {pokedex_number}")
+        if choice == '1':
+            print(f"Original names: {student_names}")
+            sorted_names = bubble_sort(student_names.copy())
+            print(f"Sorted names: {sorted_names}")
 
-        if self.total_cards >= self.MAX_POKEDEX_NUMBER:
-            print("You have caught them all!!")
+        elif choice == '2':
+            print(f"Original scores: {test_scores}")
+            sorted_scores = insertion_sort(test_scores.copy())
+            print(f"Sorted scores: {sorted_scores}")
+            print("Top 5 Scores:")
+            for i in range(1, 6):
+                print(f"{i}. {sorted_scores[-i]}")
 
-    def reset_binder(self):
-        confirmation = input("WARNING: This will delete ALL Pokemon cards from the binder. This action cannot be undone. Type CONFIRM to reset or EXIT to return to the Main Menu: ")
-        if confirmation == "CONFIRM":
-            self.binder.clear()
-            self.total_cards = 0
-            print("The binder reset was successful! All cards have been removed.")
+        elif choice == '3':
+            print(f"Original prices: {book_prices}")
+            recursive_calls = 0
+            sorted_prices = book_prices.copy()
+            recursive_calls = quick_sort(sorted_prices, 0, len(sorted_prices) - 1, recursive_calls)
+            print(f"Sorted prices: {sorted_prices}")
+            print(f"Recursive calls: {recursive_calls}")
+
+        elif choice == '4':
+            print("Thank you for using the sorting program!")
+            break
+
         else:
-            print("Reset cancelled.")
-
-    def display_cards(self):
-        if not self.binder:
-            print("The binder is empty.")
-            print("Total cards in binder: 0")
-            print("Completion: 0%")
-            return
-        
-        print("Current Binder Contents:")
-        for pokedex_number, (page, position) in self.binder.items():
-            print(f"Pokedex {pokedex_number} - Page: {page} Position: Row {position[0]}, Column {position[1]}")
-        
-        completion_percentage = (self.total_cards / self.MAX_POKEDEX_NUMBER) * 100
-        print(f"Total cards in binder: {self.total_cards} - Completion: {completion_percentage:.2f}%")
-
-    def calculate_page_number(self):
-        return (self.total_cards // self.CARDS_PER_PAGE) + 1
-
-    def calculate_position(self):
-        index = self.total_cards % self.CARDS_PER_PAGE
-        row = (index // self.CARDS_PER_ROW) + 1
-        column = (index % self.CARDS_PER_ROW) + 1
-        return (row, column)
-
-    def is_valid_pokedex_number(self, pokedex_number):
-        return 1 <= pokedex_number <= self.MAX_POKEDEX_NUMBER
-
-
-class MainMenu:
-    
-    def __init__(self):
-        self.binder = PokemonCardBinder()
-
-    def display_menu(self):
-        while True:
-            print("\nSelect option:")
-            print("1. Add Pokémon Card")
-            print("2. Reset Binder")
-            print("3. View Current Binder")
-            print("4. Exit")
-            choice = input("Enter option: ")
-
-            if choice == "1":
-                try:
-                    pokedex_number = int(input("Enter Pokedex number (1-1025): "))
-                    self.binder.add_card(pokedex_number)
-                except ValueError:
-                    print("Invalid input! Please enter a valid integer.")
-            elif choice == "2":
-                self.binder.reset_binder()
-            elif choice == "3":
-                self.binder.display_cards()
-            elif choice == "4":
-                print("Thank you for using Pokémon Card Binder Manager!")
-                break
-            else:
-                print("Invalid choice! try again.")
-
+            print("Invalid choice. Please select a valid operation.")
 
 if __name__ == "__main__":
-    MainMenu().display_menu()
+    main()
